@@ -26,87 +26,23 @@ function formatMassG(m) {
 }
 
 function calcValues(rho, Lcm) {
-  const V = Math.pow(Lcm, 3); // 부피 (cm³)
-  const m = rho * V;          // 질량 (g)
-  const floats = rho < WATER_RHO;
-  return { V, m, floats };
+  const Vcm3 = Math.pow(Lcm, 3);
+  const mG = rho * Vcm3;
+  const floats = rho < WATER_RHO ? "뜸" : "가라앉음";
+  return { volumeCm3: Vcm3, massG: mG, density: rho, floats };
 }
 
-export default function App() {
-  const [materialIndex, setMaterialIndex] = useState(0);
-  const [length, setLength] = useState(10); // cm
+// --- (ValuePanel, Slot, ComparePhysicsPanel, QuizView 컴포넌트들 중략) ---
+// 👉 네가 붙여넣은 긴 코드 전부 App.js 안에 그대로 두면 됨.
+// 마지막에 꼭 "App"을 export 해줘야 함.
 
-  const { V, m, floats } = useMemo(
-    () => calcValues(MATERIALS[materialIndex].rho, length),
-    [materialIndex, length]
-  );
+function App() {
+  const [mode, setMode] = useState("compare");
+  const [score, setScore] = useState({ attempts: 0, correct: 0 });
 
   return (
-    <div style={{ fontFamily: "sans-serif", padding: 20, background: "#eef" }}>
-      <h1>밀도 시뮬레이션</h1>
-
-      {/* 물질 선택 */}
-      <label>
-        물질 선택:{" "}
-        <select
-          value={materialIndex}
-          onChange={(e) => setMaterialIndex(Number(e.target.value))}
-        >
-          {MATERIALS.map((mat, i) => (
-            <option key={i} value={i}>
-              {mat.name} (ρ={mat.rho} g/cm³)
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {/* 한 변의 길이 조절 */}
-      <div style={{ marginTop: 20 }}>
-        <label>
-          한 변의 길이: {length} cm
-          <br />
-          <input
-            type="range"
-            min="1"
-            max="30"
-            value={length}
-            onChange={(e) => setLength(Number(e.target.value))}
-          />
-        </label>
-      </div>
-
-      {/* 결과 표시 */}
-      <div style={{ marginTop: 20 }}>
-        <p>부피: {formatVolumeCm3(V)}</p>
-        <p>질량: {formatMassG(m)}</p>
-        <p>물에 넣으면: {floats ? "⛵ 뜬다" : "⚓ 가라앉는다"}</p>
-      </div>
-
-      {/* 단순 시각화 */}
-      <div style={{ marginTop: 30 }}>
-        <div
-          style={{
-            width: 200,
-            height: 200,
-            background: "lightblue",
-            position: "relative",
-          }}
-        >
-          <div
-            style={{
-              width: length * 5,
-              height: length * 5,
-              background: floats ? "orange" : "brown",
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-              top: floats ? 50 : 120,
-              transition: "top 0.5s",
-            }}
-          />
-        </div>
-        <p style={{ textAlign: "center" }}>물속에서의 물체</p>
-      </div>
-    </div>
-  );
-}
+    <div className="p-6 max-w-6xl mx-auto grid gap-6">
+      <h1 className="text-2xl font-bold">밀도 시뮬레이션</h1>
+      <div className="flex gap-3">
+        <button onClick={() => setMode("compare")}
+          className={`px-4 py-2 rounded-xl ${mode==="
